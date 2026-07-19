@@ -11,6 +11,7 @@
     "bark_key": "",
     "serverchan_sendkey": "",
     "pushplus_token": "",
+    "command": "",
     "webhook": {
       "url": "",
       "method": "POST",

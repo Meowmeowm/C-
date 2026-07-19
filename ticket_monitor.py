@@ -185,6 +185,28 @@ def notify_webhook(webhook, title, body):
         log("webhook 调用失败: %s" % e)
 
 
+def notify_command(cmd, title, body):
+    """有票时执行自定义命令（如调用本地微信机器人的发消息脚本）。
+
+    命令可写成字符串或参数列表，其中 {title}/{content} 会被替换为通知内容；
+    同时也通过环境变量 TICKET_TITLE / TICKET_CONTENT 传入。
+    """
+    import os
+    import shlex
+    env = dict(os.environ, TICKET_TITLE=title, TICKET_CONTENT=body)
+    try:
+        if isinstance(cmd, list):
+            cmd = render_template(cmd, {"title": title, "content": body})
+            subprocess.run(cmd, env=env, timeout=60)
+        else:
+            cmd = render_template(cmd, {"title": shlex.quote(title),
+                                        "content": shlex.quote(body)})
+            subprocess.run(cmd, shell=True, env=env, timeout=60)
+        log("已执行自定义通知命令")
+    except Exception as e:
+        log("通知命令执行失败: %s" % e)
+
+
 def notify_push(cfg, title, body):
     notify = cfg.get("notify", {})
     pushes = []
@@ -212,6 +234,8 @@ def notify_push(cfg, title, body):
     webhook = notify.get("webhook") or {}
     if webhook.get("url"):
         notify_webhook(webhook, title, body)
+    if notify.get("command"):
+        notify_command(notify["command"], title, body)
 
 
 def notify_all(cfg, title, body):

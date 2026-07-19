@@ -28,6 +28,7 @@ python ticket_monitor.py --config config.json
 | `notify.bark_key` | iPhone 推荐：App Store 装 [Bark](https://apps.apple.com/cn/app/bark/id1403753865)，把 App 里的 key 填进来 |
 | `notify.serverchan_sendkey` | 微信推送：[Server酱](https://sct.ftqq.com/) 的 SendKey |
 | `notify.pushplus_token` | 微信推送备选：[PushPlus](https://www.pushplus.plus/) 的 token |
+| `notify.command` | 有票时执行的自定义命令（字符串或参数列表），适合接本地机器人：`{title}`/`{content}` 会被替换成通知内容，同时也通过环境变量 `TICKET_TITLE`/`TICKET_CONTENT` 传入。例：`"python /path/to/bot/send_wechat.py --to 我自己 --msg {content}"` |
 | `notify.webhook` | 通用 webhook：接自建机器人（微信机器人、钉钉、飞书等任何有 HTTP 接口的服务）。填 `url` 后生效；`method`、`headers`、`body` 均可自定义，`body` 里的字符串支持 `{title}` 和 `{content}` 占位符，会被替换成通知标题和内容 |
 
 推送渠道任选其一即可（都留空则只有终端响铃和桌面弹窗）。
