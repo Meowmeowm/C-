@@ -1,0 +1,15 @@
+{
+  "date": "2026-07-20",
+  "from": "北京南",
+  "to": "上海虹桥",
+  "trains": ["G1"],
+  "seats": ["二等座", "一等座"],
+  "interval_seconds": 30,
+  "renotify_minutes": 10,
+  "notify": {
+    "desktop": true,
+    "bark_key": "",
+    "serverchan_sendkey": "",
+    "pushplus_token": ""
+  }
+}
