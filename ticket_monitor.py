@@ -153,6 +153,38 @@ def notify_desktop(title, body):
         pass
 
 
+def render_template(obj, mapping):
+    """把 obj 里所有字符串中的 {title}/{content} 替换为实际内容"""
+    if isinstance(obj, str):
+        for k, v in mapping.items():
+            obj = obj.replace("{%s}" % k, v)
+        return obj
+    if isinstance(obj, dict):
+        return {k: render_template(v, mapping) for k, v in obj.items()}
+    if isinstance(obj, list):
+        return [render_template(v, mapping) for v in obj]
+    return obj
+
+
+def notify_webhook(webhook, title, body):
+    """调用自定义 webhook（如自建微信机器人），body 模板里可用 {title} 和 {content}"""
+    mapping = {"title": title, "content": body}
+    method = (webhook.get("method") or "POST").upper()
+    headers = render_template(webhook.get("headers") or {}, mapping)
+    payload = render_template(webhook.get("body"), mapping)
+    try:
+        if isinstance(payload, (dict, list)):
+            requests.request(method, webhook["url"], json=payload,
+                             headers=headers, timeout=15)
+        else:
+            requests.request(method, webhook["url"],
+                             data=(payload or "").encode("utf-8"),
+                             headers=headers, timeout=15)
+        log("已调用自定义 webhook")
+    except requests.RequestException as e:
+        log("webhook 调用失败: %s" % e)
+
+
 def notify_push(cfg, title, body):
     notify = cfg.get("notify", {})
     pushes = []
@@ -177,6 +209,9 @@ def notify_push(cfg, title, body):
             log("已推送到 %s" % name)
         except requests.RequestException as e:
             log("推送到 %s 失败: %s" % (name, e))
+    webhook = notify.get("webhook") or {}
+    if webhook.get("url"):
+        notify_webhook(webhook, title, body)
 
 
 def notify_all(cfg, title, body):

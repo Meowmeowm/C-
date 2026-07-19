@@ -10,6 +10,12 @@
     "desktop": true,
     "bark_key": "",
     "serverchan_sendkey": "",
-    "pushplus_token": ""
+    "pushplus_token": "",
+    "webhook": {
+      "url": "",
+      "method": "POST",
+      "headers": { "Content-Type": "application/json" },
+      "body": { "message": "{title}\n{content}" }
+    }
   }
 }
